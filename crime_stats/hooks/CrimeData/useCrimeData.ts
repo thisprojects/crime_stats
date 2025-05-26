@@ -1,11 +1,10 @@
 // hooks/useCrimeData.ts
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import {
   CrimeApiResponse,
   ApiErrorResponse,
   CrimeDataParams,
-  UseCrimeDataOptions,
 } from "@/types/Crime/crime";
 
 // Validation functions
@@ -33,12 +32,15 @@ function validateCrimeParams(params: Partial<CrimeDataParams>): {
   };
 }
 
+const currentMonth = () => {
+  const now = new Date();
+  return now.toISOString().slice(0, 7);
+};
+
 /**
  * Custom hook for fetching UK Police crime data
  */
-export function useCrimeData(options: UseCrimeDataOptions = {}) {
-  const { date, lat, lng, enabled = true } = options;
-
+const useCrimeData = () => {
   const [data, setData] = useState<CrimeApiResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,88 +49,87 @@ export function useCrimeData(options: UseCrimeDataOptions = {}) {
   /**
    * Fetch crime data from the API
    */
-  const fetchCrimeData = useCallback(
-    async (
-      params: Partial<CrimeDataParams> = {}
-    ): Promise<CrimeApiResponse | null> => {
-      // Use provided params or fall back to hook params
-      const requestParams: Partial<CrimeDataParams> = {
-        date: params.date || date,
-        lat: params.lat || lat,
-        lng: params.lng || lng,
-      };
+  const fetchCrimeData = async (
+    params: Partial<CrimeDataParams> = {}
+  ): Promise<CrimeApiResponse | null> => {
+    // Use provided params or fall back to hook params
+    const requestParams: Partial<CrimeDataParams> = {
+      date: params.date || "2025-01",
+      lat: params.lat,
+      lng: params.lng,
+    };
 
-      // Validate required parameters
-      const validation = validateCrimeParams(requestParams);
-      if (!validation.isValid) {
-        const errorMessage = `Missing required parameters: ${validation.missingParams.join(
-          ", "
-        )}`;
-        setError(errorMessage);
-        return null;
-      }
+    // Validate required parameters
+    const validation = validateCrimeParams(requestParams);
+    if (!validation.isValid) {
+      const errorMessage = `Missing required parameters: ${validation.missingParams.join(
+        ", "
+      )}`;
+      setError(errorMessage);
+      return null;
+    }
 
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError(null);
 
-      try {
-        // Build query string
-        const queryParams = new URLSearchParams({
-          date: validation.validParams!.date,
-          lat: validation.validParams!.lat.toString(),
-          lng: validation.validParams!.lng.toString(),
-        });
+    try {
+      // Build query string
+      const queryParams = new URLSearchParams({
+        date: validation.validParams!.date,
+        lat: validation.validParams!.lat.toString(),
+        lng: validation.validParams!.lng.toString(),
+      });
 
-        const response = await fetch(`/api/street_level_crime?${queryParams}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+      const response = await fetch(`/api/street_level_crime?${queryParams}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-        if (!response.ok) {
-          let errorData: ApiErrorResponse;
+      if (!response.ok) {
+        let errorData: ApiErrorResponse;
 
-          try {
-            errorData = await response.json();
-          } catch {
-            errorData = { error: `HTTP error! status: ${response.status}` };
-          }
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = { error: `HTTP error! status: ${response.status}` };
+        }
 
-          if (response.status === 429) {
-            throw new Error(
-              errorData.error || "Rate limit exceeded. Please try again later."
-            );
-          }
-
-          if (response.status === 404) {
-            throw new Error(
-              errorData.error ||
-                "No crime data found for the specified location and date."
-            );
-          }
-
+        if (response.status === 429) {
           throw new Error(
-            errorData.error || `HTTP error! status: ${response.status}`
+            errorData.error || "Rate limit exceeded. Please try again later."
           );
         }
 
-        const result: CrimeApiResponse = await response.json();
-        setData(result);
-        setLastFetched(new Date());
-        return result;
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Failed to fetch crime data";
-        setError(errorMessage);
-        console.error("Crime data fetch error:", err);
-        return null;
-      } finally {
-        setLoading(false);
+        if (response.status === 404) {
+          throw new Error(
+            errorData.error ||
+              "No crime data found for the specified location and date."
+          );
+        }
+
+        throw new Error(
+          errorData.error || `HTTP error! status: ${response.status}`
+        );
       }
-    },
-    [date, lat, lng]
-  );
+
+      const result: CrimeApiResponse = await response.json();
+      setData(result);
+      setLastFetched(new Date());
+
+      return result;
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch crime data";
+      setError(errorMessage);
+
+      console.error("Crime data fetch error:", err);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   /**
    * Reset the hook state
@@ -139,13 +140,6 @@ export function useCrimeData(options: UseCrimeDataOptions = {}) {
     setLoading(false);
     setLastFetched(null);
   }, []);
-
-  // Auto-fetch data when parameters change (if enabled)
-  useEffect(() => {
-    if (enabled && date && lat !== undefined && lng !== undefined) {
-      fetchCrimeData();
-    }
-  }, [enabled, date, lat, lng, fetchCrimeData]);
 
   return {
     // Data
@@ -162,4 +156,6 @@ export function useCrimeData(options: UseCrimeDataOptions = {}) {
     isEmpty: data !== null && Array.isArray(data) && data.length === 0,
     hasData: data !== null && Array.isArray(data) && data.length > 0,
   };
-}
+};
+
+export default useCrimeData;
