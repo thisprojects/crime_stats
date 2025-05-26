@@ -43,12 +43,6 @@ function getClientIP(request: NextRequest): string {
   return "unknown";
 }
 
-function isValidPostcode(postcode: string): boolean {
-  // Basic UK postcode validation
-  const ukPostcodeRegex = /^[A-Z]{1,2}[0-9][A-Z0-9]?\s?[0-9][A-Z]{2}$/i;
-  return ukPostcodeRegex.test(postcode.replace(/\s/g, ""));
-}
-
 export async function GET(request: NextRequest) {
   try {
     // Get client IP for rate limiting
@@ -69,14 +63,6 @@ export async function GET(request: NextRequest) {
     if (!postcode) {
       return NextResponse.json(
         { error: "Postcode parameter is required" },
-        { status: 400 }
-      );
-    }
-
-    // Validate postcode format
-    if (!isValidPostcode(postcode)) {
-      return NextResponse.json(
-        { error: "Invalid postcode format" },
         { status: 400 }
       );
     }
