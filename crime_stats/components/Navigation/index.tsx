@@ -1,5 +1,12 @@
-import React, { useState } from "react";
+import React, {
+  MouseEvent,
+  useState,
+  KeyboardEvent,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import { useGeocode } from "@/hooks/GeoCodeHook/useGeocode";
+import { PostcodeResponse } from "@/types/GeoCode/geoCode";
 
 const navigation = [
   { name: "Dashboard", href: "#", current: true },
@@ -8,19 +15,28 @@ const navigation = [
   { name: "Calendar", href: "#", current: false },
 ];
 
-export default function NavigationWithSearch() {
+interface NavigationWithSearchProps {
+  setLocation: Dispatch<SetStateAction<PostcodeResponse | null>>;
+}
+
+export default function NavigationWithSearch({
+  setLocation,
+}: NavigationWithSearchProps) {
   const [postcode, setPostcode] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const { data, loading, error, geocodePostcode } = useGeocode();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (
+    e: MouseEvent<HTMLButtonElement> | KeyboardEvent<HTMLInputElement>
+  ) => {
     e.preventDefault();
     if (!postcode.trim()) return;
 
     try {
-      await geocodePostcode(postcode.trim());
+      const postCodeResponse = await geocodePostcode(postcode.trim());
+      setLocation(postCodeResponse);
     } catch (error) {
       console.error("Geocoding failed:", error);
     }

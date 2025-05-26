@@ -3,27 +3,17 @@
 import LeafletMap from "@/components/LeafletMap";
 import Navigation from "@/components/Navigation";
 import { useGeocode } from "@/hooks/GeoCodeHook/useGeocode";
+import { PostcodeResponse } from "@/types/GeoCode/geoCode";
 import { useState } from "react";
 
 const PostcodeSearch: React.FC = () => {
   const [postcode, setPostcode] = useState("");
-  const { data, loading, error, geocodePostcode } = useGeocode();
-  console.log("DATA", data);
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!postcode.trim()) return;
-
-    try {
-      await geocodePostcode(postcode.trim());
-    } catch (error) {
-      console.error("Geocoding failed:", error);
-    }
-  };
+  const [location, setLocation] = useState<PostcodeResponse | null>(null);
 
   return (
     <>
-      <Navigation />
-      <LeafletMap location={data} />
+      <Navigation setLocation={setLocation} />
+      <LeafletMap location={location} />
     </>
   );
 };
