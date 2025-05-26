@@ -1,55 +1,9 @@
-// types/crime.ts
-export interface CrimeLocation {
-  latitude: string;
-  street: {
-    id: number;
-    name: string;
-  };
-  longitude: string;
-}
-
-export interface CrimeData {
-  category: string;
-  location_type: string;
-  location: CrimeLocation;
-  context: string;
-  outcome_status: {
-    category: string;
-    date: string;
-  } | null;
-  persistent_id: string;
-  id: number;
-  location_subtype: string;
-  month: string;
-}
-
-export interface CrimeApiResponse extends Array<CrimeData> {}
-
-export interface ApiErrorResponse {
-  error: string;
-  retryAfter?: number;
-}
-
-export interface RateLimitHeaders {
-  "X-RateLimit-Limit": string;
-  "X-RateLimit-Remaining": string;
-  "X-RateLimit-Reset": string;
-  "Retry-After"?: string;
-  "Cache-Control"?: string;
-}
-
 // pages/api/crimes.ts (or app/api/crimes/route.ts for App Router)
 
 import { NextRequest, NextResponse } from "next/server";
 import { NextApiRequest, NextApiResponse } from "next";
-// import {
-//   CrimeApiResponse,
-//   ApiErrorResponse,
-//   RateLimitHeaders,
-// } from "@/types/crime";
+import { ApiErrorResponse, CrimeApiResponse } from "@/types/Crime/crime";
 
-// Simple in-memory rate limiting store
-// In production, use Redis or a database
 const rateLimitStore = new Map<string, number[]>();
 
 // Rate limiting configuration
@@ -95,32 +49,11 @@ function checkRateLimit(ip: string): RateLimitResult {
   validRequests.push(now);
   rateLimitStore.set(key, validRequests);
 
-  // Clean up old entries periodically
-  if (Math.random() < 0.01) {
-    cleanupRateLimitStore();
-  }
-
   return {
     isLimited: false,
     remaining: remaining - 1, // Subtract 1 for current request
     resetTime,
   };
-}
-
-function cleanupRateLimitStore(): void {
-  const now = Date.now();
-  const windowStart = now - RATE_LIMIT.windowMs;
-
-  for (const [key, requests] of rateLimitStore.entries()) {
-    const validRequests = requests.filter(
-      (timestamp) => timestamp > windowStart
-    );
-    if (validRequests.length === 0) {
-      rateLimitStore.delete(key);
-    } else {
-      rateLimitStore.set(key, validRequests);
-    }
-  }
 }
 
 function getClientIP(request: NextRequest): string {

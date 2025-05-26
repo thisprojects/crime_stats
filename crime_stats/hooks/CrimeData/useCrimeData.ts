@@ -1,51 +1,12 @@
 // hooks/useCrimeData.ts
 
 import { useState, useEffect, useCallback } from "react";
-import { CrimeApiResponse, CrimeData, ApiErrorResponse } from "@/types/crime";
-
-// Hook parameter interfaces
-export interface CrimeDataParams {
-  date: string;
-  lat: number;
-  lng: number;
-}
-
-export interface UseCrimeDataOptions extends Partial<CrimeDataParams> {
-  enabled?: boolean;
-}
-
-export interface CrimeDataState {
-  data: CrimeApiResponse | null;
-  loading: boolean;
-  error: string | null;
-  lastFetched: Date | null;
-}
-
-export interface CrimeDataActions {
-  fetchCrimeData: (
-    params?: Partial<CrimeDataParams>
-  ) => Promise<CrimeApiResponse | null>;
-  retry: () => void;
-  reset: () => void;
-}
-
-export interface CrimeDataComputed {
-  isEmpty: boolean;
-  hasData: boolean;
-}
-
-export type UseCrimeDataReturn = CrimeDataState &
-  CrimeDataActions &
-  CrimeDataComputed;
-
-// Multiple requests interfaces
-export interface CrimeRequestState {
-  loading: boolean;
-  data: CrimeApiResponse | null;
-  error: string | null;
-  params: CrimeDataParams;
-  lastFetched?: Date;
-}
+import {
+  CrimeApiResponse,
+  ApiErrorResponse,
+  CrimeDataParams,
+  UseCrimeDataOptions,
+} from "@/types/Crime/crime";
 
 // Validation functions
 function validateCrimeParams(params: Partial<CrimeDataParams>): {
