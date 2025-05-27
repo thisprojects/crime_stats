@@ -16,11 +16,10 @@ export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
   useEffect(() => {
     const fetchCrimes = async () => {
       if (location?.lat && location?.lon) {
-        const response = await fetchCrimeData({
+        await fetchCrimeData({
           lat: location.lat,
           lng: location.lon,
         });
-        console.log("RESPONSE", response);
       }
     };
 
