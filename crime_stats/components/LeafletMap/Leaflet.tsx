@@ -140,20 +140,7 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
     if (!mapInstanceRef.current || !location) return;
 
     const map = mapInstanceRef.current;
-    const { lat, lon, display_name } = location;
-
-    // Remove existing marker if any
-    if (markerRef.current) {
-      map.removeLayer(markerRef.current);
-    }
-
-    // Add new marker
-    markerRef.current = L.marker([lat, lon]).addTo(map);
-
-    // Add popup with address if available
-    if (display_name) {
-      markerRef.current.bindPopup(display_name).openPopup();
-    }
+    const { lat, lon} = location;
 
     // Center map on the location
     map.setView([lat, lon], zoom);
