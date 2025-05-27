@@ -38,15 +38,15 @@ const getCrimeColor = (category: string) => {
 };
 
 export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
-  const { data, loading, error, lastFetched, fetchCrimeData, reset } =
-    useCrimeData();
-  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
-    new Set()
-  );
+  const { data, loading, error, fetchCrimeData } = useCrimeData();
+
   const [filteredData, setFilteredData] = useState<CrimeData[]>([]);
   const [isFilterExpanded, setIsFilterExpanded] = useState(true);
   const [isLegendExpanded, setIsLegendExpanded] = useState(true);
-  const [isFilterVisible, setIsFilterVisible] = useState(false);
+
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
+    new Set()
+  );
 
   // Initialize selected categories when data changes
   useEffect(() => {
@@ -70,11 +70,13 @@ export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
 
   const handleCategoryToggle = (category: string) => {
     const newSelected = new Set(selectedCategories);
+
     if (newSelected.has(category)) {
       newSelected.delete(category);
     } else {
       newSelected.add(category);
     }
+
     setSelectedCategories(newSelected);
   };
 
@@ -83,6 +85,7 @@ export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
       const allCategories = Array.from(
         new Set(data.map((crime) => crime.category))
       );
+
       setSelectedCategories(new Set(allCategories));
     }
   };
@@ -109,12 +112,12 @@ export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
     : [];
 
   return (
-    <div className="mx-auto p-6 space-y-6">
-      <div className="bg-white p-6 rounded-lg shadow-md">
+    <div className="mx-auto p-6 h-[calc(100vh-100px)] flex flex-col">
+      <div className="bg-white rounded-lg shadow-md flex-1 flex flex-col relative">
         {/* Loading State */}
-        {loading && !data && (
-          <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600">Loading crime data...</p>
+        {loading && (
+          <div className="mb-4 p-4 bg-gray-50 rounded-lg absolute top-[50%] right-[50%] z-[1000]">
+            <p className=" text-gray-600 text-2xl">Loading crime data...</p>
           </div>
         )}
 
@@ -128,11 +131,11 @@ export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
         )}
 
         {/* Map */}
-        <div className="relative border border-gray-300 rounded-lg overflow-hidden">
+        <div className="relative border border-gray-300 rounded-lg overflow-hidden flex-1">
           <LeafletMap
             location={location}
             crimeData={filteredData}
-            height="600px"
+            height="100%"
             zoom={16}
             className="rounded-lg"
           />

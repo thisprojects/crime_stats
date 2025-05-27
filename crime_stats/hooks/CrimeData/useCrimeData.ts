@@ -1,6 +1,6 @@
 // hooks/useCrimeData.ts
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import {
   CrimeApiResponse,
   ApiErrorResponse,
@@ -45,7 +45,6 @@ const useCrimeData = () => {
   const [data, setData] = useState<CrimeData[] | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastFetched, setLastFetched] = useState<Date | null>(null);
 
   /**
    * Fetch crime data from the API
@@ -117,7 +116,6 @@ const useCrimeData = () => {
 
       const result: CrimeApiResponse = await response.json();
       setData(result);
-      setLastFetched(new Date());
 
       return result;
     } catch (err) {
@@ -135,27 +133,13 @@ const useCrimeData = () => {
   /**
    * Reset the hook state
    */
-  const reset = useCallback((): void => {
-    setData(null);
-    setError(null);
-    setLoading(false);
-    setLastFetched(null);
-  }, []);
 
   return {
     // Data
     data,
     loading,
     error,
-    lastFetched,
-
-    // Methods
     fetchCrimeData,
-    reset,
-
-    // Computed properties
-    isEmpty: data !== null && Array.isArray(data) && data.length === 0,
-    hasData: data !== null && Array.isArray(data) && data.length > 0,
   };
 };
 
