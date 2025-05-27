@@ -4,10 +4,31 @@ import { useEffect, useState } from "react";
 import { LeafletMap } from "./Leaflet";
 import { PostcodeResponse } from "@/types/GeoCode/geoCode";
 import useCrimeData from "@/hooks/CrimeData/useCrimeData";
-import { CrimeData } from "@/types/Crime/crime";
 
 interface PostCodeMapSearchProps {
   location: PostcodeResponse | null;
+}
+
+interface CrimeData {
+  category: string;
+  location_type: string;
+  location: {
+    latitude: string;
+    street: {
+      id: number;
+      name: string;
+    };
+    longitude: string;
+  };
+  context: string;
+  outcome_status: {
+    category: string;
+    date: string;
+  };
+  persistent_id: string;
+  id: number;
+  location_subtype: string;
+  month: string;
 }
 
 const getCrimeColor = (category: string) => {
@@ -111,21 +132,6 @@ export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
   return (
     <div className="mx-auto p-6 space-y-6">
       <div className="bg-white p-6 rounded-lg shadow-md">
-        {/* Crime Filter */}
-        {data && data.length > 0 && (
-          <div className="mb-4 p-4 bg-blue-50 rounded-lg">
-            <h3 className="font-semibold text-lg mb-2">Crime Data Summary</h3>
-            <p className="text-sm text-gray-600">
-              Showing {filteredData.length} of {data.length} crime incidents
-            </p>
-            {loading && (
-              <p className="text-sm text-blue-600 mt-1">
-                Loading additional data...
-              </p>
-            )}
-          </div>
-        )}
-
         {/* Loading State */}
         {loading && !data && (
           <div className="mb-4 p-4 bg-gray-50 rounded-lg">
@@ -156,7 +162,7 @@ export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
           {data && data.length > 0 && (
             <button
               onClick={() => setIsFilterVisible(!isFilterVisible)}
-              className={`absolute top-20 left-2 border-gray-400 border-solid p-2 rounded-lg shadow-lg border-2 z-[1001] transition-colors ${
+              className={`absolute top-4 left-4 p-2 rounded-lg shadow-lg border z-[1001] transition-colors ${
                 isFilterVisible
                   ? "bg-green-100 hover:bg-green-200 border-green-200"
                   : "bg-white hover:bg-gray-50 border-gray-200"
@@ -183,7 +189,7 @@ export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
 
           {/* Crime Filter - Positioned absolute over map */}
           {data && data.length > 0 && isFilterVisible && (
-            <div className="absolute top-16 left-10 bg-white/95 backdrop-blur-sm p-4 rounded-lg shadow-lg border max-w-80 z-[1000]">
+            <div className="absolute top-16 left-4 bg-white/95 backdrop-blur-sm p-4 rounded-lg shadow-lg border max-w-80 z-[1000]">
               <div
                 className="flex items-center justify-between mb-3 cursor-pointer"
                 onClick={() => setIsFilterExpanded(!isFilterExpanded)}
@@ -298,6 +304,22 @@ export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
                 />
               </svg>
             </button>
+          )}
+
+          {/* Crime Data Summary - Positioned absolute at bottom of map */}
+          {data && data.length > 0 && (
+            <div className="absolute bottom-1 left-1  bg-white/95  px-3 py-2 rounded-lg shadow-lg border z-[1000]">
+              <div className="text-center">
+                <p className="text-xs text-gray-600">
+                  Showing {filteredData.length} of {data.length} crime incidents
+                </p>
+                {loading && (
+                  <p className="text-xs text-blue-600 mt-1">
+                    Loading additional data...
+                  </p>
+                )}
+              </div>
+            </div>
           )}
 
           {/* Crime Legend - Positioned absolute over map */}

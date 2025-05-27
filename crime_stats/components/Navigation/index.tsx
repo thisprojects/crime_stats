@@ -314,20 +314,6 @@ export default function NavigationWithSearch({
           </div>
         </div>
       )}
-
-      {data && (
-        <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 mt-4">
-          <div className="p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-            <h3 className="font-semibold">Location Found:</h3>
-            <p>
-              <strong>Coordinates:</strong> {data.lat}, {data.lon}
-            </p>
-            <p>
-              <strong>Address:</strong> {data.display_name}
-            </p>
-          </div>
-        </div>
-      )}
     </>
   );
 }
