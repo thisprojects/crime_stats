@@ -4,31 +4,10 @@ import { useEffect, useState } from "react";
 import { LeafletMap } from "./Leaflet";
 import { PostcodeResponse } from "@/types/GeoCode/geoCode";
 import useCrimeData from "@/hooks/CrimeData/useCrimeData";
+import { CrimeData } from "@/types/Crime/crime";
 
 interface PostCodeMapSearchProps {
   location: PostcodeResponse | null;
-}
-
-interface CrimeData {
-  category: string;
-  location_type: string;
-  location: {
-    latitude: string;
-    street: {
-      id: number;
-      name: string;
-    };
-    longitude: string;
-  };
-  context: string;
-  outcome_status: {
-    category: string;
-    date: string;
-  };
-  persistent_id: string;
-  id: number;
-  location_subtype: string;
-  month: string;
 }
 
 const getCrimeColor = (category: string) => {
@@ -66,7 +45,7 @@ export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
   );
   const [filteredData, setFilteredData] = useState<CrimeData[]>([]);
   const [isFilterExpanded, setIsFilterExpanded] = useState(true);
-  const [isLegendVisible, setIsLegendVisible] = useState(true);
+  const [isLegendExpanded, setIsLegendExpanded] = useState(true);
   const [isFilterVisible, setIsFilterVisible] = useState(false);
 
   // Initialize selected categories when data changes
@@ -158,40 +137,11 @@ export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
             className="rounded-lg"
           />
 
-          {/* Filter Toggle Button */}
-          {data && data.length > 0 && (
-            <button
-              onClick={() => setIsFilterVisible(!isFilterVisible)}
-              className={`absolute top-4 left-4 p-2 rounded-lg shadow-lg border z-[1001] transition-colors ${
-                isFilterVisible
-                  ? "bg-green-100 hover:bg-green-200 border-green-200"
-                  : "bg-white hover:bg-gray-50 border-gray-200"
-              }`}
-              title={isFilterVisible ? "Hide filters" : "Show filters"}
-            >
-              <svg
-                className={`w-4 h-4 ${
-                  isFilterVisible ? "text-green-600" : "text-gray-600"
-                }`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-                />
-              </svg>
-            </button>
-          )}
-
           {/* Crime Filter - Positioned absolute over map */}
-          {data && data.length > 0 && isFilterVisible && (
-            <div className="absolute top-16 left-4 bg-white/95 backdrop-blur-sm p-4 rounded-lg shadow-lg border max-w-80 z-[1000]">
+          {data && data.length > 0 && (
+            <div className="absolute top-2 left-15 bg-white/95 backdrop-blur-sm p-4 rounded-lg shadow-lg border max-w-80 z-[1000]">
               <div
-                className="flex items-center justify-between mb-3 cursor-pointer"
+                className="flex items-center gap-2 mb-3 cursor-pointer"
                 onClick={() => setIsFilterExpanded(!isFilterExpanded)}
               >
                 <div className="flex items-center gap-2">
@@ -223,7 +173,7 @@ export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
               </div>
 
               {isFilterExpanded && (
-                <div className="space-y-3">
+                <div className="space-y-3 mt-3">
                   <div className="flex gap-2">
                     <button
                       onClick={handleSelectAll}
@@ -277,35 +227,6 @@ export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
             </div>
           )}
 
-          {/* Legend Toggle Button */}
-          {filteredData && filteredData.length > 0 && (
-            <button
-              onClick={() => setIsLegendVisible(!isLegendVisible)}
-              className={`absolute top-4 right-4 p-2 rounded-lg shadow-lg border z-[1001] transition-colors ${
-                isLegendVisible
-                  ? "bg-blue-100 hover:bg-blue-200 border-blue-200"
-                  : "bg-white hover:bg-gray-50 border-gray-200"
-              }`}
-              title={isLegendVisible ? "Hide legend" : "Show legend"}
-            >
-              <svg
-                className={`w-4 h-4 ${
-                  isLegendVisible ? "text-blue-600" : "text-gray-600"
-                }`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-            </button>
-          )}
-
           {/* Crime Data Summary - Positioned absolute at bottom of map */}
           {data && data.length > 0 && (
             <div className="absolute bottom-1 left-1  bg-white/95  px-3 py-2 rounded-lg shadow-lg border z-[1000]">
@@ -322,31 +243,70 @@ export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
             </div>
           )}
 
-          {/* Crime Legend - Positioned absolute over map */}
-          {filteredData && filteredData.length > 0 && isLegendVisible && (
-            <div className="absolute top-16 right-4 bg-white/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border max-w-64 z-[1000]">
-              <h4 className="font-semibold text-xs mb-2">Crime Categories</h4>
-              <div className="space-y-1 max-h-80 overflow-y-auto">
-                {Array.from(
-                  new Set(filteredData.map((crime) => crime.category))
-                ).map((category) => {
-                  const count = filteredData.filter(
-                    (crime) => crime.category === category
-                  ).length;
-
-                  return (
-                    <div key={category} className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full border border-white shadow-sm flex-shrink-0"
-                        style={{ backgroundColor: getCrimeColor(category) }}
-                      ></div>
-                      <span className="capitalize text-xs">
-                        {category.replace(/-/g, " ")} ({count})
-                      </span>
-                    </div>
-                  );
-                })}
+          {/* Crime Legend - Positioned absolute over map with collapse/expand */}
+          {filteredData && filteredData.length > 0 && (
+            <div className="hidden md:block absolute top-2 right-2 bg-white/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border max-w-64 z-[1000]">
+              <div
+                className="flex items-center gap-2 cursor-pointer"
+                onClick={() => setIsLegendExpanded(!isLegendExpanded)}
+              >
+                <div className="flex gap-2 ">
+                  <h4 className="font-semibold text-sm">Crime Categories</h4>
+                  <span className="text-xs text-gray-500">
+                    (
+                    {
+                      Array.from(
+                        new Set(filteredData.map((crime) => crime.category))
+                      ).length
+                    }{" "}
+                    types)
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <svg
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      isLegendExpanded ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
               </div>
+
+              {isLegendExpanded && (
+                <div className="mt-3 max-h-80 overflow-y-auto">
+                  {Array.from(
+                    new Set(filteredData.map((crime) => crime.category))
+                  ).map((category) => {
+                    const count = filteredData.filter(
+                      (crime) => crime.category === category
+                    ).length;
+
+                    return (
+                      <div
+                        key={category}
+                        className="flex items-center gap-2 p-1"
+                      >
+                        <div
+                          className="w-3 h-3 rounded-full border border-white shadow-sm flex-shrink-0"
+                          style={{ backgroundColor: getCrimeColor(category) }}
+                        ></div>
+                        <span className="capitalize text-xs">
+                          {category.replace(/-/g, " ")} ({count})
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
         </div>
