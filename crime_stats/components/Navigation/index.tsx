@@ -7,12 +7,12 @@ import React, {
 } from "react";
 import { useGeocode } from "@/hooks/GeoCodeHook/useGeocode";
 import { PostcodeResponse } from "@/types/GeoCode/geoCode";
+import { GoLaw } from "react-icons/go";
 
 const navigation = [
   { name: "Dashboard", href: "#", current: true },
   { name: "Team", href: "#", current: false },
-  { name: "Projects", href: "#", current: false },
-  { name: "Calendar", href: "#", current: false },
+
 ];
 
 interface NavigationWithSearchProps {
@@ -23,7 +23,7 @@ export default function NavigationWithSearch({
   setLocation,
 }: NavigationWithSearchProps) {
   const [postcode, setPostcode] = useState("");
-  const [showSearch, setShowSearch] = useState(false);
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const { loading, error, geocodePostcode } = useGeocode();
@@ -45,58 +45,64 @@ export default function NavigationWithSearch({
   return (
     <>
       <nav className="bg-gray-800">
-        <div className="px-2 sm:px-6 lg:px-8">
-          <div className="relative flex h-16 items-center justify-between">
-            {/* Mobile menu button */}
-            <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:outline-none focus:ring-inset"
-              >
-                <span className="absolute -inset-0.5" />
-                <span className="sr-only">Open main menu</span>
-                <svg
-                  className={`block h-6 w-6 ${
-                    mobileMenuOpen ? "hidden" : "block"
-                  }`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
+        <div className="px-2">
+          {/* Grid Container */}
+          <div className="flex flex-row justify-between items-center md:grid md:grid-cols-3  h-16 gap-4">
+            
+            {/* Left Section - Mobile Menu + Logo/Nav */}
+            <div className="flex items-center justify-start">
+              {/* Mobile menu button */}
+              <div className="flex lg:hidden">
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="rounded-md p-2 text-gray-400 hover:bg-gray-700"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-                  />
-                </svg>
-                <svg
-                  className={`h-6 w-6 ${mobileMenuOpen ? "block" : "hidden"}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
+                  <svg
+                    className={`block h-6 w-6 ${
+                      mobileMenuOpen ? "hidden" : "block"
+                    }`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                    />
+                  </svg>
+                  <svg
+                    className={`h-6 w-6 ${mobileMenuOpen ? "block" : "hidden"}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
 
-            {/* Logo and navigation */}
-            <div className="flex justify-between sm:items-stretch sm:justify-start">
-              <div></div>
-              <div className="hidden sm:ml-6 sm:block">
+              {/* Logo */}
+              <div className="items-center gap-2 text-2xl hidden lg:flex text-gray-300 ml-2 sm:ml-0">
+                <GoLaw color="white" size="30"/>
+                <span className="text-sm xl:text-2xl">Crime Map</span>
+              </div>
+
+              {/* Desktop Navigation */}
+              <div className="hidden lg:flex lg:ml-8">
                 <div className="flex space-x-4">
                   {navigation.map((item) => (
                     <a
                       key={item.name}
                       href={item.href}
                       aria-current={item.current ? "page" : undefined}
-                      className={"text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"}
+                      className="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
                     >
                       {item.name}
                     </a>
@@ -105,99 +111,35 @@ export default function NavigationWithSearch({
               </div>
             </div>
 
-            {/* Search and profile section */}
-            <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-              {/* Search Section */}
-              <div className="flex items-center space-x-2 mr-4">
-                {!showSearch ? (
-                  <button
-                    onClick={() => setShowSearch(true)}
-                    className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-none"
-                  >
-                    <span className="absolute -inset-1.5" />
-                    <span className="sr-only">Search postcode</span>
-                    <svg
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                      />
-                    </svg>
-                  </button>
-                ) : (
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="text"
-                      value={postcode}
-                      onChange={(e) => setPostcode(e.target.value)}
-                      placeholder="UK Place or Postcode"
-                      className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-1 w-full text-gray-300"
-                      disabled={loading}
-                      onKeyPress={(e) => {
-                        if (e.key === "Enter") {
-                          handleSubmit(e);
-                        }
-                      }}
-                    />
-                    <button
-                      onClick={handleSubmit}
-                      disabled={loading || !postcode.trim()}
-                      className="rounded-md bg-indigo-600 px-3 py-1 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
-                    >
-                      {loading ? "..." : "Go"}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowSearch(false);
-                        setPostcode("");
-                      }}
-                      className="text-gray-400 hover:text-white"
-                    >
-                      <svg
-                        className="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Notification button */}
-              <button
-                type="button"
-                className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-none mr-3"
-              >
-                <span className="absolute -inset-1.5" />
-                <span className="sr-only">View notifications</span>
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
+            {/* Center Section - Search (takes maximum available space) */}
+            <div className="flex">
+              <div className="flex gap-2 w-full max-w-md">
+                <input
+                  type="text"
+                  value={postcode}
+                  onChange={(e) => setPostcode(e.target.value)}
+                  placeholder="UK Place or Postcode"
+                  className="rounded-md border-gray-100 border-1 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-3 py-2 flex-1 text-gray-900 bg-white"
+                  disabled={loading}
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      handleSubmit(e);
+                    }
+                  }}
+                />
+                <button
+                  onClick={handleSubmit}
+                  disabled={loading || !postcode.trim()}
+                  className="rounded-md bg-indigo-600 px-3 py-1 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 flex-shrink-0"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-                  />
-                </svg>
-              </button>
+                  {loading ? "..." : "Go"}
+                </button>
+              </div>
+            </div>
+
+            {/* Right Section - Notifications + Profile */}
+            <div className="flex items-center justify-end gap-3">
+
 
               {/* Profile dropdown */}
               <div className="relative">
@@ -205,8 +147,6 @@ export default function NavigationWithSearch({
                   onClick={() => setProfileMenuOpen(!profileMenuOpen)}
                   className="relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-none"
                 >
-                  <span className="absolute -inset-1.5" />
-                  <span className="sr-only">Open user menu</span>
                   <img
                     alt=""
                     src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
@@ -255,8 +195,8 @@ export default function NavigationWithSearch({
                       item.current
                         ? "bg-gray-900 text-white"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                    },
-                    "block rounded-md px-3 py-2 text-base font-medium"
+                    }
+                    block rounded-md px-3 py-2 text-base font-medium
                   `}
                 >
                   {item.name}
