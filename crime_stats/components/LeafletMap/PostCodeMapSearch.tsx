@@ -66,6 +66,7 @@ export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
   );
   const [filteredData, setFilteredData] = useState<CrimeData[]>([]);
   const [isFilterExpanded, setIsFilterExpanded] = useState(true);
+  const [isLegendVisible, setIsLegendVisible] = useState(true);
 
   // Initialize selected categories when data changes
   useEffect(() => {
@@ -250,7 +251,7 @@ export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
         )}
 
         {/* Map */}
-        <div className="border border-gray-300 rounded-lg overflow-hidden">
+        <div className="relative border border-gray-300 rounded-lg overflow-hidden">
           <LeafletMap
             location={location}
             crimeData={filteredData}
@@ -258,42 +259,69 @@ export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
             zoom={16}
             className="rounded-lg"
           />
+
+          {/* Legend Toggle Button */}
+          {filteredData && filteredData.length > 0 && (
+            <button
+              onClick={() => setIsLegendVisible(!isLegendVisible)}
+              className={`absolute top-4 right-4 p-2 rounded-lg shadow-lg border z-[1001] transition-colors ${
+                isLegendVisible
+                  ? "bg-blue-100 hover:bg-blue-200 border-blue-200"
+                  : "bg-white hover:bg-gray-50 border-gray-200"
+              }`}
+              title={isLegendVisible ? "Hide legend" : "Show legend"}
+            >
+              <svg
+                className={`w-4 h-4 ${
+                  isLegendVisible ? "text-blue-600" : "text-gray-600"
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+            </button>
+          )}
+
+          {/* Crime Legend - Positioned absolute over map */}
+          {filteredData && filteredData.length > 0 && isLegendVisible && (
+            <div className="absolute top-16 right-4 bg-white/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border max-w-64 z-[1000]">
+              <h4 className="font-semibold text-xs mb-2">Crime Categories</h4>
+              <div className="space-y-1 max-h-80 overflow-y-auto">
+                {Array.from(
+                  new Set(filteredData.map((crime) => crime.category))
+                ).map((category) => {
+                  const count = filteredData.filter(
+                    (crime) => crime.category === category
+                  ).length;
+
+                  return (
+                    <div key={category} className="flex items-center gap-2">
+                      <div
+                        className="w-3 h-3 rounded-full border border-white shadow-sm flex-shrink-0"
+                        style={{ backgroundColor: getCrimeColor(category) }}
+                      ></div>
+                      <span className="capitalize text-xs">
+                        {category.replace(/-/g, " ")} ({count})
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {!location && (
           <p className="text-gray-500 text-center mt-4">
             Enter a postcode above to see its location and crime data on the map
           </p>
-        )}
-
-        {/* Crime Legend - Now shows filtered counts */}
-        {filteredData && filteredData.length > 0 && (
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-            <h4 className="font-semibold text-sm mb-3">
-              Currently Displayed Crime Categories
-            </h4>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 text-xs">
-              {Array.from(
-                new Set(filteredData.map((crime) => crime.category))
-              ).map((category) => {
-                const count = filteredData.filter(
-                  (crime) => crime.category === category
-                ).length;
-
-                return (
-                  <div key={category} className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-full border border-white shadow-sm"
-                      style={{ backgroundColor: getCrimeColor(category) }}
-                    ></div>
-                    <span className="capitalize">
-                      {category.replace(/-/g, " ")} ({count})
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
         )}
 
         {/* No results message when all filters are unchecked */}
