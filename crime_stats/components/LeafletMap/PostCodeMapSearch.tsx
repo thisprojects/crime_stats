@@ -141,7 +141,7 @@ export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
           {data && data.length > 0 && (
             <div className="absolute top-2 left-15 bg-white/95 backdrop-blur-sm p-4 rounded-lg shadow-lg border max-w-80 z-[1000]">
               <div
-                className="flex items-center gap-2 mb-3 cursor-pointer"
+                className="flex items-center gap-2 cursor-pointer"
                 onClick={() => setIsFilterExpanded(!isFilterExpanded)}
               >
                 <div className="flex items-center gap-2">
