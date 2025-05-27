@@ -5,6 +5,7 @@ import {
   CrimeApiResponse,
   ApiErrorResponse,
   CrimeDataParams,
+  CrimeData,
 } from "@/types/Crime/crime";
 
 // Validation functions
@@ -41,7 +42,7 @@ const currentMonth = () => {
  * Custom hook for fetching UK Police crime data
  */
 const useCrimeData = () => {
-  const [data, setData] = useState<CrimeApiResponse | null>(null);
+  const [data, setData] = useState<CrimeData[] | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [lastFetched, setLastFetched] = useState<Date | null>(null);
