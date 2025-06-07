@@ -2,6 +2,7 @@ export interface PostcodeResponse {
   lat: number;
   lon: number;
   display_name: string;
+  date?: string;
 }
 
 export interface NominatimResult {

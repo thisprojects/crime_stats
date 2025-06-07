@@ -16,12 +16,10 @@ const navigation = [
 
 interface NavigationWithSearchProps {
   setLocation: Dispatch<SetStateAction<PostcodeResponse | null>>;
-  onDateChange?: (date: string) => void;
 }
 
 export default function NavigationWithSearch({
   setLocation,
-  onDateChange,
 }: NavigationWithSearchProps) {
   const [postcode, setPostcode] = useState("");
   const [selectedYear, setSelectedYear] = useState("2025");
@@ -58,11 +56,10 @@ export default function NavigationWithSearch({
 
     try {
       const postCodeResponse = await geocodePostcode(postcode.trim());
-      setLocation(postCodeResponse);
-
-      // Notify parent component about date change
-      const dateString = `${selectedYear}-${selectedMonth}`;
-      onDateChange?.(dateString);
+      setLocation({
+        ...postCodeResponse,
+        date: `${selectedYear}-${selectedMonth}`,
+      });
     } catch (error) {
       console.error("Geocoding failed:", error);
     }
@@ -70,14 +67,10 @@ export default function NavigationWithSearch({
 
   const handleYearChange = (year: string) => {
     setSelectedYear(year);
-    const dateString = `${year}-${selectedMonth}`;
-    onDateChange?.(dateString);
   };
 
   const handleMonthChange = (month: string) => {
     setSelectedMonth(month);
-    const dateString = `${selectedYear}-${month}`;
-    onDateChange?.(dateString);
   };
 
   return (
