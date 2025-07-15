@@ -48,6 +48,8 @@ interface LeafletMapProps {
   width?: string;
   zoom?: number;
   className?: string;
+  preserveZoom?: boolean; // New prop to control zoom behavior
+  autoFitBounds?: boolean; // New prop to control auto-fitting
 }
 
 interface GroupedCrime {
@@ -287,11 +289,13 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
   width = "100%",
   zoom = 15,
   className = "",
+  preserveZoom = true, // Default to preserving zoom
+  autoFitBounds = false, // Default to not auto-fitting bounds
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
-  const markerRef = useRef<L.Marker | null>(null);
   const crimeMarkersRef = useRef<L.Marker[]>([]);
+  const currentLocationRef = useRef<MapLocation | null>(null);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -327,9 +331,20 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
     const map = mapInstanceRef.current;
     const { lat, lon } = location;
 
-    // Center map on the location
-    map.setView([lat, lon], zoom);
-  }, [location, zoom]);
+    // Only center and zoom if this is a new location or if preserveZoom is false
+    const isNewLocation =
+      !currentLocationRef.current ||
+      currentLocationRef.current.lat !== lat ||
+      currentLocationRef.current.lon !== lon;
+
+    if (isNewLocation || !preserveZoom) {
+      map.setView([lat, lon], zoom);
+      currentLocationRef.current = location;
+    } else if (preserveZoom) {
+      // Just center the map without changing zoom
+      map.panTo([lat, lon]);
+    }
+  }, [location, zoom, preserveZoom]);
 
   // Handle crime data markers with grouping
   useEffect(() => {
@@ -362,13 +377,13 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
         crimeMarkersRef.current.push(marker);
       });
 
-      // Fit map to show all crime markers if we have them
-      if (crimeMarkersRef.current.length > 0) {
+      // Only fit map to show all crime markers if autoFitBounds is true
+      if (autoFitBounds && crimeMarkersRef.current.length > 0) {
         const group = new L.FeatureGroup(crimeMarkersRef.current);
         map.fitBounds(group.getBounds().pad(0.1));
       }
     }
-  }, [crimeData]);
+  }, [crimeData, autoFitBounds]);
 
   return (
     <div
