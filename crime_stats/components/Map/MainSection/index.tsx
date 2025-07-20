@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LeafletMap } from "../Leaflet";
+import { LeafletMap } from "../LeafletComponents";
 import { PostcodeResponse } from "@/types/GeoCode/geoCode";
 import useCrimeData from "@/hooks/CrimeData/useCrimeData";
 import { CrimeData } from "@/types/Crime/crime";
+import Loading from "./Loading";
+import DisplayError from "./Error";
 
 interface PostCodeMapSearchProps {
   location: PostcodeResponse | null;
@@ -115,21 +117,8 @@ export const PostcodeMapSearch = ({ location }: PostCodeMapSearchProps) => {
   return (
     <div className="mx-auto p-6 h-[calc(100vh-100px)] flex flex-col">
       <div className="bg-white rounded-lg shadow-md flex-1 flex flex-col relative">
-        {/* Loading State */}
-        {loading && (
-          <div className="mb-4 p-4 bg-gray-50 rounded-lg absolute top-[50%] right-[50%] z-[1000]">
-            <p className=" text-gray-600 text-2xl">Loading crime data...</p>
-          </div>
-        )}
-
-        {/* Error State */}
-        {error && (
-          <div className="mb-4 p-4 bg-red-50 rounded-lg">
-            <p className="text-sm text-red-600">
-              Error loading crime data: {error}
-            </p>
-          </div>
-        )}
+        <Loading loading={loading} />
+        <DisplayError error={error} />
 
         {/* Map */}
         <div className="relative border border-gray-300 rounded-lg overflow-hidden flex-1">
