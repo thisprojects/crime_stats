@@ -24,10 +24,12 @@ export const useGeocode = () => {
 
       const data: PostcodeResponse = await response.json();
       setState({ data, loading: false, error: null });
+
       return data;
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error occurred";
+
       setState({ data: null, loading: false, error: errorMessage });
       throw error;
     }

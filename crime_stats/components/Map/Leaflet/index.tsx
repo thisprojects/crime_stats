@@ -48,8 +48,8 @@ interface LeafletMapProps {
   width?: string;
   zoom?: number;
   className?: string;
-  preserveZoom?: boolean; // New prop to control zoom behavior
-  autoFitBounds?: boolean; // New prop to control auto-fitting
+  preserveZoom?: boolean;
+  autoFitBounds?: boolean;
 }
 
 interface GroupedCrime {

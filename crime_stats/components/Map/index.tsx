@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 
 const DynamicPostcodeMapSearch = dynamic(
   () =>
-    import("./PostCodeMapSearch").then((mod) => ({
+    import("./MainSection").then((mod) => ({
       default: mod.PostcodeMapSearch,
     })),
   {

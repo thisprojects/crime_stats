@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LeafletMap } from "./Leaflet";
+import { LeafletMap } from "../Leaflet";
 import { PostcodeResponse } from "@/types/GeoCode/geoCode";
 import useCrimeData from "@/hooks/CrimeData/useCrimeData";
 import { CrimeData } from "@/types/Crime/crime";

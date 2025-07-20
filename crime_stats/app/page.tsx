@@ -1,6 +1,6 @@
 "use client";
 
-import LeafletMap from "@/components/LeafletMap";
+import LeafletMap from "@/components/Map";
 import Navigation from "@/components/Navigation";
 import { PostcodeResponse } from "@/types/GeoCode/geoCode";
 import { useState } from "react";
