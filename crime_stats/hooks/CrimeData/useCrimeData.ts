@@ -8,7 +8,6 @@ import {
   CrimeData,
 } from "@/types/Crime/crime";
 
-// Validation functions
 function validateCrimeParams(params: Partial<CrimeDataParams>): {
   isValid: boolean;
   missingParams: string[];
@@ -33,38 +32,27 @@ function validateCrimeParams(params: Partial<CrimeDataParams>): {
   };
 }
 
-const currentMonth = () => {
-  const now = new Date();
-  return now.toISOString().slice(0, 7);
-};
-
-/**
- * Custom hook for fetching UK Police crime data
- */
 const useCrimeData = () => {
   const [data, setData] = useState<CrimeData[] | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  /**
-   * Fetch crime data from the API
-   */
   const fetchCrimeData = async (
     params: Partial<CrimeDataParams> = {}
   ): Promise<CrimeApiResponse | null> => {
-    // Use provided params or fall back to hook params
     const requestParams: Partial<CrimeDataParams> = {
       date: params.date || "2025-01",
       lat: params.lat,
       lng: params.lng,
     };
 
-    // Validate required parameters
     const validation = validateCrimeParams(requestParams);
+
     if (!validation.isValid) {
       const errorMessage = `Missing required parameters: ${validation.missingParams.join(
         ", "
       )}`;
+
       setError(errorMessage);
       return null;
     }
@@ -73,7 +61,6 @@ const useCrimeData = () => {
     setError(null);
 
     try {
-      // Build query string
       const queryParams = new URLSearchParams({
         date: validation.validParams!.date,
         lat: validation.validParams!.lat.toString(),
@@ -121,21 +108,17 @@ const useCrimeData = () => {
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to fetch crime data";
-      setError(errorMessage);
 
+      setError(errorMessage);
       console.error("Crime data fetch error:", err);
+
       return null;
     } finally {
       setLoading(false);
     }
   };
 
-  /**
-   * Reset the hook state
-   */
-
   return {
-    // Data
     data,
     loading,
     error,

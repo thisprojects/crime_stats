@@ -16,12 +16,13 @@ const Filter = ({
   const { getCrimeColor } = useMapHelpers();
   const [isFilterExpanded, setIsFilterExpanded] = useState<boolean>(true);
 
-  // Initialize selected categories when data changes
+  // Initialise selected categories when data changes
   useEffect(() => {
     if (data && data.length > 0) {
       const allCategories = Array.from(
         new Set(data.map((crime) => crime.category))
       );
+
       setSelectedCategories(new Set(allCategories));
     }
   }, [data]);
@@ -111,6 +112,7 @@ const Filter = ({
                 const count = data.filter(
                   (crime) => crime.category === category
                 ).length;
+
                 const isSelected = selectedCategories.has(category);
 
                 return (
