@@ -1,7 +1,6 @@
 // pages/api/crimes.ts (or app/api/crimes/route.ts for App Router)
 
 import { NextRequest, NextResponse } from "next/server";
-import { NextApiRequest, NextApiResponse } from "next";
 import { ApiErrorResponse, CrimeApiResponse } from "@/types/Crime/crime";
 
 const rateLimitStore = new Map<string, number[]>();
@@ -195,87 +194,5 @@ export async function GET(
       { error: "Failed to fetch crime data. Please try again later." },
       { status: 500 }
     );
-  }
-}
-
-// For Pages Router (pages/api/crimes.ts)
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<CrimeApiResponse | ApiErrorResponse>
-): Promise<void> {
-  if (req.method !== "GET") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
-  try {
-    // Get client IP and check rate limit
-    const clientIP = req.socket.remoteAddress as string;
-    const rateLimitResult = checkRateLimit(clientIP);
-
-    if (rateLimitResult.isLimited) {
-      return res.status(429).json({
-        error: "Rate limit exceeded. Please try again later.",
-        retryAfter: Math.ceil(RATE_LIMIT.windowMs / 1000),
-      });
-    }
-
-    const { date, lat, lng } = req.query;
-
-    // Type guard for query parameters
-    if (
-      typeof date !== "string" ||
-      typeof lat !== "string" ||
-      typeof lng !== "string"
-    ) {
-      return res.status(400).json({
-        error: "Missing required parameters: date, lat, lng",
-      });
-    }
-
-    // Validate date format (YYYY-MM)
-    if (!validateDateFormat(date)) {
-      return res.status(400).json({
-        error: "Invalid date format. Use YYYY-MM (e.g., 2024-01)",
-      });
-    }
-
-    // Validate coordinates
-    const coordinateValidation = validateCoordinates(lat, lng);
-    if (!coordinateValidation.isValid) {
-      return res.status(400).json({
-        error: coordinateValidation.error!,
-      });
-    }
-
-    // Build the API URL
-    const apiUrl = `https://data.police.uk/api/crimes-street/all-crime?date=${encodeURIComponent(
-      date
-    )}&lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}`;
-
-    // Fetch data from the police API
-    const response = await fetch(apiUrl, {
-      headers: {
-        "User-Agent": "Next.js Crime Data App",
-      },
-    });
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        return res.status(404).json({
-          error: "No data found for the specified location and date",
-        });
-      }
-
-      throw new Error(`Police API responded with status: ${response.status}`);
-    }
-
-    const data: CrimeApiResponse = await response.json();
-
-    res.status(200).json(data);
-  } catch (error) {
-    console.error("Crime API Error:", error);
-    res.status(500).json({
-      error: "Failed to fetch crime data. Please try again later.",
-    });
   }
 }

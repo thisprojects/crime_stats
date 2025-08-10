@@ -2,8 +2,8 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef } from "react";
 
-// Fix for default markers in Leaflet with webpack
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+// @ts-expect-error - Accessing private Leaflet method for icon URL fix
+delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
@@ -223,7 +223,7 @@ const createGroupedPopupContent = (groupedCrime: GroupedCrime): string => {
         <div class="space-y-2">
     `;
 
-    categorycrimes.forEach((crime, index) => {
+    categorycrimes.forEach((crime) => {
       popupContent += `
         <div class="text-xs p-2 bg-gray-50 rounded border-l-2" style="border-left-color: ${getCrimeColor(
           crime.category
